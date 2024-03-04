@@ -35,7 +35,7 @@ exports.login = async (req, res) => {
             return wrapper.responseErrors(res, 'failed login, ' + result.error, 409, null)
 
             console.log(result);
-        return wrapper.responseSuccess(res, 'success register', result.data, 201)
+        return wrapper.responseSuccess(res, 'success register', result.data, 200)
 
     } catch (error) {
         return wrapper.responseErrors(res, 'failed register, internal error', 500, error)
