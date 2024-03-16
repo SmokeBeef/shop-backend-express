@@ -56,5 +56,16 @@ const login = async (data) => {
 
 }
 
+const getMe = async (id) => {
+    const user = await db.user.findUnique({
+        where: {
+            id
+        }
+    })
+    delete user.password
 
-module.exports = { register, login }
+    return wrapper.data(user, null);
+}
+
+
+module.exports = { register, login, getMe }

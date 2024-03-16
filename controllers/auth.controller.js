@@ -6,7 +6,7 @@ const authService = require('../service/auth.service')
 
 exports.register = async (req, res) => {
     try {
-        const { data, isError, error } = validate(registerSchema, req.body || {})
+        const { data, isError, error } = validate(registerSchema, req.body)
         if (isError) {
             return wrapper.responseErrors(res, 'failed register, missing properties', 400, error)
         }
@@ -25,7 +25,7 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
     try {
-        const { data, error, isError } = validate(loginSchema, req.body || {})
+        const { data, error, isError } = validate(loginSchema, req.body)
         if (isError) {
             return wrapper.responseErrors(res, 'failed login, missing properties', 400, error)
         }
@@ -34,11 +34,27 @@ exports.login = async (req, res) => {
         if (result.error)
             return wrapper.responseErrors(res, 'failed login, ' + result.error, 409, null)
 
-            console.log(result);
+        console.log(result);
         return wrapper.responseSuccess(res, 'success register', result.data, 200)
 
     } catch (error) {
         return wrapper.responseErrors(res, 'failed register, internal error', 500, error)
-    
+
+    }
+}
+
+exports.me = async (req, res) => {
+    try {
+        const id = req.user.sub;
+        console.log(id);
+        const result = await authService.getMe(id)
+        if (result.error)
+            return wrapper.responseErrors(res, 'failed login, ' + result.error, 404, null)
+
+        return wrapper.responseSuccess(res, 'success register', result.data, 200)
+
+    } catch (error) {
+        return wrapper.responseErrors(res, 'failed register, internal error', 500, error)
+
     }
 }
