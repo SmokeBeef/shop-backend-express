@@ -7,7 +7,7 @@ const db = new PrismaClient()
 
 const register = async (data) => {
 
-    const checkEmail = await db.user.findFirst({
+    const checkEmail = await db.users.findFirst({
         where: {
             email: data.email
         }
@@ -18,9 +18,10 @@ const register = async (data) => {
     }
 
     data.password = await bcrypt.hash(data.password, 10)
-    const result = await db.user.create({ data })
+    const result = await db.users.create({ data })
 
-    sendMail()
+    sendMail(result.email, `${result.first_name} ${result.last_name}`, result.id)
+
 
     delete result.password
     return result
@@ -28,7 +29,7 @@ const register = async (data) => {
 
 const login = async (data) => {
 
-    const findUser = await db.user.findFirst({
+    const findUser = await db.users.findFirst({
         where: {
             email: data.email
         }
@@ -57,7 +58,7 @@ const login = async (data) => {
 }
 
 const getMe = async (id) => {
-    const user = await db.user.findUnique({
+    const user = await db.users.findUnique({
         where: {
             id
         }
@@ -67,5 +68,33 @@ const getMe = async (id) => {
     return wrapper.data(user, null);
 }
 
+const accountVerfiy = async (userId) => {
+    const user = await db.users.findFirst({
+        where: {
+            id: userId,
+            is_verified: false
+        }
+    })
 
-module.exports = { register, login, getMe }
+    if (!user) {
+        return wrapper.data(null, 'account not found')
+    }
+    console.log(user);
+    const updatedUser = await db.users.update({
+        where: {
+            id: userId
+        },
+        data: {
+            is_verified: true
+        }
+    })
+    db.carts.create({
+        data: {
+            user_id: userId
+        }
+    })
+
+    return wrapper.data(updatedUser)
+}
+
+module.exports = { register, login, getMe, accountVerfiy }

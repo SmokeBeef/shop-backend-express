@@ -1,5 +1,5 @@
 exports.validate = (shema, data) => {
-    const { error, value } = shema.validate(data || {}, { abortEarly: false })
+    const { error, value } = shema.validate(data || {}, { abortEarly: false, stripUnknown: true })
 
 
     if (error) {

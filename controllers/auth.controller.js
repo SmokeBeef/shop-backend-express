@@ -49,12 +49,37 @@ exports.me = async (req, res) => {
         console.log(id);
         const result = await authService.getMe(id)
         if (result.error)
-            return wrapper.responseErrors(res, 'failed login, ' + result.error, 404, null)
+            return wrapper.responseErrors(res, 'failed get auth user' + result.error, 404, null)
 
-        return wrapper.responseSuccess(res, 'success register', result.data, 200)
+        return wrapper.responseSuccess(res, 'success get auth user', result.data, 200)
 
     } catch (error) {
         return wrapper.responseErrors(res, 'failed register, internal error', 500, error)
+
+    }
+}
+
+exports.accountVerify = async (req, res) => {
+    try {
+        const userId = req.params.userId
+
+        const result = await authService.accountVerfiy(userId)
+        if (!result.isSuccess) {
+            return res.send('failed to verify')
+        }
+
+        
+        res.send(`Success verify 
+        <script>
+        setTimeout(() => {
+            window.location.replace('${process.env.REDIRECT_URL}')
+        }, 1500);
+        </script>
+        `);
+
+    } catch (error) {
+        console.log(error);
+        return res.send('failed verify, there is error in internal server')
 
     }
 }

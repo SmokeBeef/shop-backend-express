@@ -13,7 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model user {
+model users {
   id          String    @id @default(uuid())
   first_name  String    @db.VarChar(100)
   last_name   String    @db.VarChar(100)
@@ -23,4 +23,120 @@ model user {
   address     String?   @db.VarChar(255)
   no_telp     String?   @db.Char(13)
   is_verified Boolean?  @default(false)
+
+  carts  carts[]
+  orders orders[]
+  shops  shops?
+}
+
+model products {
+  id          String  @id @default(uuid())
+  name        String  @db.VarChar(155)
+  price       Int?
+  desc        String? @db.Text
+  image       String  @db.VarChar(255)
+  category_id String
+  shop_id     String
+
+  create_at DateTime @default(now())
+
+  cart_items    cart_items[]
+  product_types product_types[]
+  detail_orders detail_orders[]
+
+  category categories @relation(fields: [category_id], references: [id])
+  shop     shops      @relation(fields: [shop_id], references: [id])
+}
+
+model categories {
+  id   String @id @default(uuid())
+  name String @unique @db.VarChar(100)
+
+  products products[]
+}
+
+model product_types {
+  id         String @id @default(uuid())
+  product_id String
+  name       String @db.VarChar(100)
+  price      Int    @db.Int
+
+  product       products        @relation(fields: [product_id], references: [id])
+  cart_items    cart_items[]
+  detail_orders detail_orders[]
+}
+
+model carts {
+  id      String  @id @default(uuid())
+  user_id String?
+
+  items cart_items[]
+  user  users?       @relation(fields: [user_id], references: [id])
+}
+
+model cart_items {
+  id              String  @id @default(uuid())
+  cart_id         String
+  product_id      String
+  product_type_id String?
+  quantity        Int
+
+  product_type product_types? @relation(fields: [product_type_id], references: [id])
+  cart         carts          @relation(fields: [cart_id], references: [id])
+  product      products       @relation(fields: [product_id], references: [id])
+}
+
+model shops {
+  id      String  @id @default(uuid())
+  name    String
+  image   String? @db.VarChar(255)
+  desc    String? @db.Text
+  user_id String  @unique
+
+  products products[]
+  user     users?     @relation(fields: [user_id], references: [id])
+}
+
+model orders {
+  id              String    @id @default(uuid())
+  invoice         String
+  user_id         String
+  is_arrived      Boolean   @default(false)
+  arrive_at       DateTime? @db.Timestamp()
+  total_ammount   Int
+  create_at       DateTime  @default(now())
+  shipping_method String
+  payment_method  String
+
+  detail_orders detail_orders[]
+  user          users           @relation(fields: [user_id], references: [id])
+}
+
+model detail_orders {
+  id              String  @id @default(uuid())
+  order_id        String
+  product_id      String
+  product_type_id String?
+  quantity        Int
+  sub_total       Int
+
+  product_type product_types? @relation(fields: [product_type_id], references: [id])
+  product      products       @relation(fields: [product_id], references: [id])
+  order        orders         @relation(fields: [order_id], references: [id])
+}
+
+model address_deliverys {
+  id           String @id @default(uuid())
+  user_name    String
+  country      String
+  address      String
+  city         String
+  province     String
+  postal_code  String
+  phone_number String
+}
+
+enum payment_method {
+  cod
+  bank
 }
