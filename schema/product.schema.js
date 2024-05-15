@@ -8,11 +8,12 @@ const productType = Joi.object({
 const createProductSchema = Joi.object({
     name: Joi.string().required().max(155),
     image: Joi.string().required(),
-    desc: Joi.string().optional(),
+    desc: Joi.string().optional().allow(null),
     price: Joi.number().required(),
     category_id: Joi.string().required(),
     user_id: Joi.string().required(),
-    product_types: Joi.array().items(productType).optional()
+    product_types: Joi.array().items(productType).optional().allow(null),
+    weight: Joi.number().required(),
 })
 
 

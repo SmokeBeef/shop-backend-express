@@ -47,7 +47,7 @@ const login = async (data) => {
         no_telp: findUser.no_telp
 
     }
-    const accessToken = jsonwebtoken.sign(payload, secretKey, { expiresIn: '1h' });
+    const accessToken = jsonwebtoken.sign(payload, secretKey, { expiresIn: '3h' });
 
     delete findUser.password
     return wrapper.data({

@@ -16,6 +16,15 @@ exports.createProduct = async (data) => {
         return wrapper.data(null, "User does not have a shop")
     }
 
+    const category = await db.categories.findFirst({
+        where: {
+            id: data.category_id
+        }
+    })
+
+    if (!category)
+        return wrapper.data(null, "category does not exist")
+
     data.shop_id = userShop.id
     delete data.user_id
 
@@ -63,10 +72,10 @@ exports.getProducts = async (page, limit, search, category_id = null) => {
         skip: paginate.skip,
         take: paginate.take,
         where: condition,
-        
+
     })
 
-    const totalItems = db.products.count({where: condition})
+    const totalItems = db.products.count({ where: condition })
 
     const result = await Promise.all([products, totalItems])
 

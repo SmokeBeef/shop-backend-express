@@ -37,6 +37,7 @@ model products {
   image       String  @db.VarChar(255)
   category_id String
   shop_id     String
+  weight      Int
 
   create_at DateTime @default(now())
 
@@ -87,26 +88,27 @@ model cart_items {
 }
 
 model shops {
-  id      String  @id @default(uuid())
-  name    String
-  image   String? @db.VarChar(255)
-  desc    String? @db.Text
-  user_id String  @unique
+  id           String  @id @default(uuid())
+  name         String
+  image        String? @db.VarChar(255)
+  desc         String? @db.Text
+  user_id      String  @unique
+  address      String
+  postal_code  String  @db.Char(10)
+  phone_number String  @db.Char(15)
 
   products products[]
   user     users?     @relation(fields: [user_id], references: [id])
 }
 
 model orders {
-  id              String    @id @default(uuid())
-  invoice         String
-  user_id         String
-  is_arrived      Boolean   @default(false)
-  arrive_at       DateTime? @db.Timestamp()
-  total_ammount   Int
-  create_at       DateTime  @default(now())
-  shipping_method String
-  payment_method  String
+  id            String   @id @default(uuid())
+  invoice       String
+  user_id       String
+  total_ammount Int
+  create_at     DateTime @default(now())
+  data          String   @db.Text
+  proof         String?
 
   detail_orders detail_orders[]
   user          users           @relation(fields: [user_id], references: [id])
@@ -123,20 +125,4 @@ model detail_orders {
   product_type product_types? @relation(fields: [product_type_id], references: [id])
   product      products       @relation(fields: [product_id], references: [id])
   order        orders         @relation(fields: [order_id], references: [id])
-}
-
-model address_deliverys {
-  id           String @id @default(uuid())
-  user_name    String
-  country      String
-  address      String
-  city         String
-  province     String
-  postal_code  String
-  phone_number String
-}
-
-enum payment_method {
-  cod
-  bank
 }

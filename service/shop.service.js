@@ -13,7 +13,10 @@ exports.createShop = async (data) => {
         return wrapper.data(null, "User already has a shop")
     }
     const result = await db.shops.create({
-        data: data
+        data: {
+            ...data,
+            postal_code: `${data.postal_code}`
+        }
     })
     return wrapper.data(result)
 }

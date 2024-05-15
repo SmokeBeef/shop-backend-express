@@ -1,0 +1,1 @@
+console.log(new URLSearchParams({input: 'asdasd', apa: 'itu'}).toString());
